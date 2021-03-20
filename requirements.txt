@@ -1,8 +1,8 @@
 flask
 numpy
 gunicorn
+opencv-python
 tensorflow
 imutils
 keras
-opencv-python
 os
