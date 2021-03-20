@@ -1,0 +1,8 @@
+flask
+numpy
+gunicorn
+tensorflow
+imutils
+keras
+cv2
+os
