@@ -13,7 +13,7 @@ def analyze(filename, sentence):
 
     # Load the input image from disk
     print("[INFO] loading image...")
-    # image = cv2.imread(image) # PNG
+    # image = cv2.imread(filename) # PNG
     image = optimize(filename) #JPEG
 
     # Perform image to grayscale, blur(reduce the noise), and edge detection
@@ -47,6 +47,8 @@ def analyze(filename, sentence):
 
     # Evaluates if prediction is above 70% expected char
     # Otherwise assigns the expected char and rates to 0 the prediction
+    # print(f"EXPECTED: {expected}")
+    # print(f"PREDICTIONS: {predictions}")
     for i in range(len(expected)):
         if expected[i] != predictions[i]['letter'] or predictions[i]['rate'] < 70:
             predictions[i]['letter'] = expected[i]
