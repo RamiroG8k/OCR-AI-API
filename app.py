@@ -90,7 +90,7 @@ def saveMetricData(predictions):
     return insertedPredictions
 
 def saveMetric(metricDataArray, user, phrase, generalAverage):
-    metric = {"date":datetime.now(),"phrase": phrase["_id"], "user_id":user["_id"],"general_average":generalAverage, "metric_data":metricDataArray}
+    metric = {"date":datetime.utcnow().timestamp(),"phrase": phrase["_id"], "user_id":user["_id"],"general_average":generalAverage, "metric_data":metricDataArray}
     metricSaved = collectionMetric.insert_one(metric).inserted_id
     return metricSaved
 
