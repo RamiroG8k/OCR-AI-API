@@ -1,15 +1,18 @@
 from flask import Flask, request, jsonify
+from pymongo.message import insert
 from ocr_handwriting import analyze
 import requests
-import pymongo
 from bson.objectid import ObjectId
 from pymongo import MongoClient
+from datetime import datetime
 
 cluster = MongoClient("mongodb+srv://root:rootEdpPassword@edp-cluster.v8edx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = cluster["edp"]
 collectionUsers = db["tokens"]
 collectionPhrase = db["phrase"]
 collectionUser = db["user"]
+collectionPredictions = db["metric_data"]
+collectionMetric = db["metric"]
 
 
 app = Flask(__name__)
@@ -44,8 +47,13 @@ def image():
         # Main algorithm, Analize image characters
         preds = analyze(filename, sentence)
         
+
         # Calculates general rate
         average = sum(p['rate'] for p in preds) / len(preds)
+
+        #Save metric_data and metric in mongo
+        metric_dataArrray = saveMetricData(preds)
+        saveMetric(metric_dataArrray,user, phrase, average)
 
         # Gets the chars to improve in
         c_list = []
@@ -71,10 +79,20 @@ def isValidToken(token):
 def getUser(userId):
     return collectionUser.find_one({"_id" : ObjectId(userId)})
 
-
 def getPhrase(phraseId):
     return collectionPhrase.find_one({ "_id":  ObjectId(phraseId)})
     
+def saveMetricData(predictions):
+    insertedPredictions = []
+    for prediction in predictions:
+        metric_data = {"Letter":prediction["letter"],"average":prediction["rate"]}
+        insertedPredictions.append(collectionPredictions.insert_one(metric_data).inserted_id)
+    return insertedPredictions
+
+def saveMetric(metricDataArray, user, phrase, generalAverage):
+    metric = {"date":datetime.now(),"phrase": phrase["_id"], "user_id":user["_id"],"general_average":generalAverage, "metric_data":metricDataArray}
+    metricSaved = collectionMetric.insert_one(metric).inserted_id
+    return metricSaved
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
