@@ -85,12 +85,12 @@ def getPhrase(phraseId):
 def saveMetricData(predictions):
     insertedPredictions = []
     for prediction in predictions:
-        metric_data = {"Letter":prediction["letter"],"average":prediction["rate"]}
+        metric_data = {"letter":prediction["letter"],"average":prediction["predicted"]}
         insertedPredictions.append(collectionPredictions.insert_one(metric_data).inserted_id)
     return insertedPredictions
 
 def saveMetric(metricDataArray, user, phrase, generalAverage):
-    metric = {"date":datetime.utcnow().timestamp(),"phrase": phrase["_id"], "user_id":user["_id"],"general_average":generalAverage, "metric_data":metricDataArray}
+    metric = {"date":datetime.today(),"phrase": phrase["_id"], "user_id":user["_id"],"general_average":generalAverage, "metrics_data":metricDataArray}
     metricSaved = collectionMetric.insert_one(metric).inserted_id
     return metricSaved
 
