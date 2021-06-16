@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from pymongo.message import insert
 from ocr_handwriting import analyze
 import requests
@@ -16,10 +17,9 @@ collectionMetric = db["metric"]
 
 
 app = Flask(__name__)
+CORS(app)
 
 # TODO
-# - Almacenar la informacion en la base de datos
-# - Aquellas letras con rate menor a 70%
 # debe de retornar en el reponse la actividad para mejorar la calidad de esa letra.
 
 @app.route('/image', methods=['GET'])
