@@ -14,6 +14,10 @@ _Tensorflow, Open CV and Imutils_
 pip install tensorflow
 pip install imutils
 pip install opencv-python
+pip install pymongo
+pip install dnspython
+
+pip install Flask
 ```
 
 ## Testing with loaded model ⚙️
@@ -21,12 +25,6 @@ pip install opencv-python
 _To begin with, there are two initial required arguments, the model path and the image path_
 
 ```
-python ocr_handwriting.py --model handwriting.model --image images/umbc_address.png
-```
-## Training model 🖇️
-
-_To begin with, there are two initial required arguments, the model path and the training data(csv)_
-
-```
-python train_ocr_model.py --az a_z_handwritten_data.csv --model handwriting.model
+Start making requests!
+http://127.0.0.1:5000
 ```
