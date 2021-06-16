@@ -21,13 +21,12 @@ app = Flask(__name__)
 # - Almacenar la informacion en la base de datos
 # - Aquellas letras con rate menor a 70%
 # debe de retornar en el reponse la actividad para mejorar la calidad de esa letra.
-
-@app.route('/image', methods=['GET'])
+@app.route('/image', methods=['POST'])
 def image():
     token = request.headers.get('Authorization')
     # Expected phrase
-    phraseId = request.form.get('phraseid')
-    phrase = getPhrase(phraseId);
+    phraseId = request.form.get('phraseId')
+    phrase = getPhrase(phraseId)
     # User
     userId = request.form.get('userId')
     user = getUser(userId)

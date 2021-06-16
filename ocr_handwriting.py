@@ -37,9 +37,9 @@ def analyze(filename, sentence):
     # Show the final image
     # cv2.imshow("Image prediction", image)
     # cv2.waitKey(0)
-
     # Remove image in local, Raw imread | Optimize imread 
     os.remove(filename)
+    # Remove if optimize used
     os.remove(OUTPUT)
 
     # Splits in chars the expected sentence
