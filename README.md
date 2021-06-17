@@ -16,6 +16,7 @@ pip install imutils
 pip install opencv-python
 pip install pymongo
 pip install dnspython
+pip install flask_cors
 
 pip install Flask
 ```

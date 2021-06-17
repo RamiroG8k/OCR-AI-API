@@ -7,7 +7,8 @@ from bson.objectid import ObjectId
 from pymongo import MongoClient
 from datetime import datetime
 
-cluster = MongoClient("mongodb+srv://root:rootEdpPassword@edp-cluster.v8edx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+cluster = MongoClient(
+    "mongodb+srv://root:rootEdpPassword@edp-cluster.v8edx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 db = cluster["edp"]
 collectionUsers = db["tokens"]
 collectionPhrase = db["phrase"]
@@ -15,12 +16,17 @@ collectionUser = db["user"]
 collectionPredictions = db["metric_data"]
 collectionMetric = db["metric"]
 
-
 app = Flask(__name__)
 CORS(app)
 
-# TODO
-# debe de retornar en el reponse la actividad para mejorar la calidad de esa letra.
+@app.route('/hello', methods=['GET'])
+def hello():
+    # Response
+    return jsonify({
+        "status": "ok",
+        "message": "Hello"
+    })
+
 @app.route('/image', methods=['POST'])
 def image():
     token = request.headers.get('Authorization')
@@ -30,7 +36,7 @@ def image():
     # User
     userId = request.form.get('userId')
     user = getUser(userId)
-    
+
     if(not isValidToken(token)):
         return ('Unauthorized user'), 401
     elif(phrase == None):
@@ -45,14 +51,13 @@ def image():
         sentence = phrase["data"]
         # Main algorithm, Analize image characters
         preds = analyze(filename, sentence)
-        
 
         # Calculates general rate
         average = sum(p['rate'] for p in preds) / len(preds)
 
-        #Save metric_data and metric in mongo
+        # Save metric_data and metric in mongo
         metric_dataArrray = saveMetricData(preds)
-        saveMetric(metric_dataArrray,user, phrase, average)
+        saveMetric(metric_dataArrray, user, phrase, average)
 
         # Gets the chars to improve in
         c_list = []
@@ -66,32 +71,40 @@ def image():
             "gral_rate": average,
             "to_improve": c_list,
         })
-    
-        
+
 
 def isValidToken(token):
-    response = requests.post("https://edp-api.herokuapp.com/auth/validate-token", headers={'Authorization': token})
+    response = requests.post(
+        "https://edp-api.herokuapp.com/auth/validate-token", headers={'Authorization': token})
     if(response.status_code == 200):
         return True
     return False
 
+
 def getUser(userId):
-    return collectionUser.find_one({"_id" : ObjectId(userId)})
+    return collectionUser.find_one({"_id": ObjectId(userId)})
+
 
 def getPhrase(phraseId):
-    return collectionPhrase.find_one({ "_id":  ObjectId(phraseId)})
-    
+    return collectionPhrase.find_one({"_id":  ObjectId(phraseId)})
+
+
 def saveMetricData(predictions):
     insertedPredictions = []
     for prediction in predictions:
-        metric_data = {"letter":prediction["letter"],"average":prediction["predicted"]}
-        insertedPredictions.append(collectionPredictions.insert_one(metric_data).inserted_id)
+        metric_data = {
+            "letter": prediction["letter"], "average": prediction["predicted"]}
+        insertedPredictions.append(
+            collectionPredictions.insert_one(metric_data).inserted_id)
     return insertedPredictions
 
+
 def saveMetric(metricDataArray, user, phrase, generalAverage):
-    metric = {"date":datetime.today(),"phrase": phrase["_id"], "user_id":user["_id"],"general_average":generalAverage, "metrics_data":metricDataArray}
+    metric = {"date": datetime.today(), "phrase": phrase["_id"], "user_id": user["_id"],
+              "general_average": generalAverage, "metrics_data": metricDataArray}
     metricSaved = collectionMetric.insert_one(metric).inserted_id
     return metricSaved
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
